@@ -103,12 +103,7 @@ class Operator(CharmBase):
             return
 
         # Get OIDC client info
-        oidc = self._get_interface("oidc-client")
-
-        if oidc:
-            oidc_client_info = list(oidc.get_data().values())
-        else:
-            oidc_client_info = []
+        oidc_client_info = self.get_oidc_clients()
 
         # Load config values as convenient variables
         connectors = yaml.safe_load(self.model.config["connectors"])
@@ -202,6 +197,24 @@ class Operator(CharmBase):
                 }
 
                 ingress.send_data(data, app_name)
+
+    def get_oidc_clients(self):
+        oidc_client_info = []
+
+        if oidc := self._get_interface("oidc-client"):
+            oidc_client_info += list(oidc.get_data().values())
+
+        if self.config.get("static-client-id"):
+            oidc_client_info.append(
+                {
+                    "id": self.config["static-client-id"],
+                    "secret": self.config["static-client-secret"],
+                    "name": "static_client",
+                    "redirectURIs": [self.config["static-redirect-uri"]],
+                }
+            )
+
+        return oidc_client_info
 
     def _check_leader(self):
         if not self.unit.is_leader():

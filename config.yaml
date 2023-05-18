@@ -24,3 +24,12 @@ options:
     type: string
     default: ''
     description: Static password for logging in without an external auth service
+  static-client-id:
+    type: string
+    description: Static client_id
+  static-client-secret:
+    type: string
+    description: Static client_secret
+  static-redirect-uri:
+    type: string
+    description: Static redirect-uri
